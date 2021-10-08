@@ -14,14 +14,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(WheelieException.class)
     protected ResponseEntity<?> handleWheelieException(WheelieException e) {
-        log.error(e.getClass().getName() + ": " + e);
+        log.error("####################################################################");
+        log.error("#################### Wheelie Error Occurred!! ######################");
+        log.error(e.getClass().getSimpleName() + ": " + e);
+        log.error("######################## Error Occurred!! ##########################");
+        log.error("####################################################################");
+
         return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
     }
 
     @ExceptionHandler(AccountException.class)
     protected ResponseEntity<?> handleAccountException(AccountException e) {
-        log.error("There was a problem with Account");
-        log.error("Error", e);
+        log.error("####################################################################");
+        log.error("################### Account Error Occurred!! #######################");
+        log.error(e.getClass().getSimpleName() + ": " + e);
+        log.error("######################## Error Occurred!! ##########################");
+        log.error("####################################################################");
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

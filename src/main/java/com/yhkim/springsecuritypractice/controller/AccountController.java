@@ -40,7 +40,7 @@ public class AccountController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<AccountDTO.MyData> getMyData(@ApiIgnore @WheelieAccount Account account) {
+    public ResponseEntity<AccountDTO.MyData> getMyData(@ApiIgnore @WheelieAccount Account account) throws WheelieException {
         AccountDTO.MyData myData = accountService.getMyData(account);
         return ResponseEntity.ok(myData);
     }

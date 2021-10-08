@@ -46,7 +46,7 @@ public class AccountService {
                 .build());
     }
 
-    public AccountDTO.MyData getMyData(Account user) {
+    public AccountDTO.MyData getMyData(Account user) throws WheelieException {
         return AccountDTO.MyData.builder()
                 .nickname(user.getNickname())
                 .email(user.getEmail() == null ? "" : user.getEmail())
