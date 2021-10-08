@@ -6,7 +6,7 @@ spring:
     init:
       schema-locations: classpath*:db/WheelieSchema.sql
       username: root
-      password: UwAp!d!5
+      password: flatron123!
       mode: always
       platform: mysql
 

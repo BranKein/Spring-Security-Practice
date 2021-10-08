@@ -1,5 +1,6 @@
 package com.yhkim.springsecuritypractice.controller;
 
+import com.yhkim.springsecuritypractice.annotations.EscapeAccountAspect;
 import com.yhkim.springsecuritypractice.annotations.WheelieAccount;
 import com.yhkim.springsecuritypractice.controller.dto.AccountDTO;
 import com.yhkim.springsecuritypractice.exception.WheelieException;
@@ -21,6 +22,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    @EscapeAccountAspect
     @PostMapping("/login")
     public ResponseEntity<AccountDTO.LoginResponse> loginV2(@RequestBody AccountDTO.LoginRequest loginRequest) {
         try {

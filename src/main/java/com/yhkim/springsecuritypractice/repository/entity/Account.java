@@ -2,7 +2,6 @@ package com.yhkim.springsecuritypractice.repository.entity;
 
 import com.yhkim.springsecuritypractice.common.UuidUtils;
 import com.yhkim.springsecuritypractice.controller.dto.AccountDTO;
-import com.yhkim.springsecuritypractice.mapping.AccountMapper;
 import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import lombok.*;
 
@@ -38,9 +37,12 @@ public class Account {
 
     @Transient
     public static Account toAccountEntityFromLoginObject(AccountDTO.LoginObject loginObject) {
-        Account account = AccountMapper.INSTANCE.accountDtoToEntity(loginObject);
-        account.setUuid(UuidUtils.uuid());
-
-        return account;
+        return Account.builder()
+                .uuid(UuidUtils.uuid())
+                .kakaoId(Long.parseLong(loginObject.getId()))
+                .nickname(loginObject.getNickname())
+                .email("example@gmail.com")
+                .profileImageUrl(loginObject.getProfileImageUrl())
+                .build();
     }
 }

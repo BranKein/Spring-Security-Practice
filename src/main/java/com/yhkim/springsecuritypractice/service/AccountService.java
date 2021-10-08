@@ -1,10 +1,9 @@
 package com.yhkim.springsecuritypractice.service;
 
 import com.yhkim.springsecuritypractice.common.UuidUtils;
-import com.yhkim.springsecuritypractice.common.WheelieJWT;
 import com.yhkim.springsecuritypractice.controller.dto.AccountDTO;
-import com.yhkim.springsecuritypractice.exception.AccountException;
 import com.yhkim.springsecuritypractice.exception.WheelieException;
+import com.yhkim.springsecuritypractice.provider.JwtTokenProvider;
 import com.yhkim.springsecuritypractice.repository.AccountRepository;
 import com.yhkim.springsecuritypractice.repository.TokenRepository;
 import com.yhkim.springsecuritypractice.repository.entity.Account;
@@ -12,7 +11,6 @@ import com.yhkim.springsecuritypractice.repository.entity.Token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +23,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TokenRepository tokenRepository;
-    private final WheelieJWT wheelieJWT;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public ResponseEntity<AccountDTO.LoginResponse> loginV2(AccountDTO.LoginRequest loginRequest) throws WheelieException {
         AccountDTO.LoginObject loginObject = AccountDTO.LoginObject.builder()
@@ -62,9 +60,9 @@ public class AccountService {
                 .account(account.getUuid())
                 .createdAt(Long.toString(Calendar.getInstance().getTimeInMillis()))
                 .build();
-        String JWT = wheelieJWT.makeJwtToken(token);
+        String JWT = jwtTokenProvider.makeJwtToken(token);
 
-        Token verifiedToken = wheelieJWT.verifyToken(JWT);
+        Token verifiedToken = jwtTokenProvider.verifyToken(JWT);
         tokenRepository.saveAndFlush(verifiedToken);
         return JWT;
     }

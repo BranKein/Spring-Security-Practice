@@ -6,10 +6,7 @@ import com.yhkim.springsecuritypractice.repository.AccountRepository;
 import com.yhkim.springsecuritypractice.repository.TokenRepository;
 import com.yhkim.springsecuritypractice.repository.entity.Account;
 import com.yhkim.springsecuritypractice.repository.entity.Token;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -38,10 +35,10 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setClaims(tokenMap)
                 .setIssuer("Wheelie")
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + Duration.ofDays(999999999).toMillis()))
-                .setClaims(tokenMap)
+                .setExpiration(new Date(now.getTime() + Duration.ofDays(365 * 10).toMillis()))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
@@ -54,14 +51,16 @@ public class JwtTokenProvider {
         }
         Account account = accountRepository.findById(token.getAccount())
                 .orElseThrow(() -> new AuthenticationException("no_such_user"){});
-        return new AuthenticationAccount(account);
+        Authentication authentication =  new AuthenticationAccount(account);
+        authentication.setAuthenticated(true);
+        return authentication;
     }
 
     public String resolveToken(HttpServletRequest request) {
         String tokenStr = request.getHeader("Authorization");
 
         if (tokenStr == null || tokenStr.isEmpty()) {
-            throw new AuthenticationException("no_token_in_header"){};
+            return null;
         }
 
         String[] splitToken = tokenStr.split(" ");
@@ -73,11 +72,12 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String jwtToken) {
         try {
-            Claims claims = Jwts.parser()
+            Jws<Claims> claims = Jwts.parser()
                     .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(jwtToken)
-                    .getBody();
-            return !claims.getExpiration().before(new Date());
+                    .parseClaimsJws(jwtToken);
+
+            Date exp = claims.getBody().getExpiration();
+            return !exp.before(new Date());
         } catch (Exception e) {
             return false;
         }
