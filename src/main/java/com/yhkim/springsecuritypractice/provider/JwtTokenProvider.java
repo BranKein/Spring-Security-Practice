@@ -44,6 +44,11 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String tokenString) {
+        return new AuthenticationAccount(tokenString);
+    }
+
+    public Authentication authenticate(Authentication authentication) {
+        String tokenString = (String) authentication.getPrincipal();
         Token token = verifyToken(tokenString);
         if(!tokenRepository.existsByUuidEqualsAndAccountEqualsAndCreatedAtEquals(
                 token.getUuid(), token.getAccount(), token.getCreatedAt())) {
@@ -51,9 +56,8 @@ public class JwtTokenProvider {
         }
         Account account = accountRepository.findById(token.getAccount())
                 .orElseThrow(() -> new AuthenticationException("no_such_user"){});
-        Authentication authentication =  new AuthenticationAccount(account);
-        authentication.setAuthenticated(true);
-        return authentication;
+
+        return new AuthenticationAccount(authentication, account);
     }
 
     public String resolveToken(HttpServletRequest request) {
